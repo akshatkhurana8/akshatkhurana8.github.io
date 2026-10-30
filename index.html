@@ -452,14 +452,35 @@
           <h3 class="item-title">The effect of income transfers on perinatal depression: a systematic review</h3>
           <p>Do income transfers reduce depression during pregnancy and after birth? The question sits where social protection meets maternal mental health, and I carried out the review from search strategy to synthesis.</p>
           <figure class="evidence" id="evidence">
-            <svg id="evidence-grid" viewBox="0 0 498 198" role="img" aria-label="Chart of 1,000 squares, one for each screened record, with 10 highlighted for the included studies."></svg>
+            <svg id="evidence-grid" viewBox="0 0 498 198" role="img" aria-label="Chart of 1,000 squares, one for each record found, with 9 highlighted for the included studies."></svg>
             <figcaption>
-              <span class="key-note">1,000 records screened. Each square is one record.</span>
-              <span class="key"><span class="swatch swatch-out" aria-hidden="true"></span>990 records excluded</span>
-              <span class="key"><span class="swatch swatch-in" aria-hidden="true"></span>10 studies included</span>
+              <span class="key-note">Each square is one of the 1,000 records found. After removing duplicates, 721 were screened and 9 studies were included.</span>
+              <span class="key"><span class="swatch swatch-out" aria-hidden="true"></span>Removed or excluded</span>
+              <span class="key"><span class="swatch swatch-in" aria-hidden="true"></span>9 studies included</span>
             </figcaption>
           </figure>
-          <p class="runin"><b>Methods.</b> Searches of MEDLINE, Embase, PsycINFO and EconLit; screening and data extraction following PRISMA 2020; risk-of-bias assessment with RoB 2 and ROBINS-I; synthesis without meta-analysis (SWiM).</p>
+          <p class="runin"><b>Methods.</b> Searches of MEDLINE, Embase, PsycINFO, Global Health and EconLit; screening and data extraction following PRISMA 2020; risk-of-bias assessment with RoB 2 and ROBINS-I; synthesis without meta-analysis (SWiM).</p>
+          <p class="runin"><b>From review to policy.</b> I’ve turned the findings into policy briefs for the UK and India, listed under <a href="#writing">Writing</a>.</p>
+        </div>
+      </article>
+
+      <article class="row item">
+        <div class="meta"><b>Independent project</b><span>Built with AI assistance</span><span>2026</span></div>
+        <div class="body">
+          <h3 class="item-title">NHS Watch: England’s NHS against its own targets</h3>
+          <p>A monthly tracker of NHS England’s headline performance, from the planned-care waiting list to A&amp;E, ambulance and cancer waits, measured against the government’s own targets for 2026 to 2029. It also follows the reforms changing how the NHS is run, including the abolition of NHS England.</p>
+          <p class="runin"><b>October 2026 finding.</b> At last year’s pace, the 18-week standard for planned care returns in late 2032, not March 2029.</p>
+          <p><a href="nhs-watch.html">Open NHS Watch</a></p>
+        </div>
+      </article>
+
+      <article class="row item">
+        <div class="meta"><b>Independent project</b><span>Built with AI assistance</span><span>2026</span></div>
+        <div class="body">
+          <h3 class="item-title">India Health Watch: India’s health system against its own targets</h3>
+          <p>Tracks India’s health spending, maternal and child health and nutrition against the targets set in the National Health Policy 2017 and POSHAN Abhiyaan, using the National Health Accounts, NFHS-6 and the Sample Registration System.</p>
+          <p class="runin"><b>October 2026 finding.</b> Public health spending reached 1.43% of GDP in 2022-23. On the decade’s trend, the 2.5% target arrives around 2037, twelve years after its deadline.</p>
+          <p><a href="india-health-watch.html">Open India Health Watch</a></p>
         </div>
       </article>
 
@@ -664,9 +685,23 @@
       <h2 class="sec-title" id="writing-title">Writing</h2>
       <div class="row intro-row">
         <div class="body offset">
-          <p>Occasional essays on Medium, mostly about mental health and health systems. <a href="https://medium.com/@akshatkhurana" target="_blank" rel="noopener noreferrer">All posts on Medium<span class="visually-hidden"> (opens in a new tab)</span></a></p>
+          <p>Policy briefs and occasional essays on Medium, mostly about mental health and health systems. <a href="https://medium.com/@akshatkhurana" target="_blank" rel="noopener noreferrer">All posts on Medium<span class="visually-hidden"> (opens in a new tab)</span></a></p>
         </div>
       </div>
+      <article class="row tight">
+        <div class="meta">Oct 2026</div>
+        <div class="body">
+          <h3 class="post-title"><a href="uk-two-child-limit-brief.pdf">Income transfers and perinatal depression: what the evidence means as the two-child limit ends<span class="visually-hidden"> (PDF)</span></a></h3>
+          <p class="post-desc">Policy brief (PDF). What cash support can and can’t do for mothers’ mental health, now the UK has ended the two-child limit.</p>
+        </div>
+      </article>
+      <article class="row tight">
+        <div class="meta">Oct 2026</div>
+        <div class="body">
+          <h3 class="post-title"><a href="india-maternity-benefit-brief.pdf">Making India’s maternity benefit reach mothers<span class="visually-hidden"> (PDF)</span></a></h3>
+          <p class="post-desc">Policy brief (PDF). Why fewer women are paid under PMMVY than before the pandemic, and what would fix it.</p>
+        </div>
+      </article>
       <article class="row tight">
         <div class="meta">Apr 2024</div>
         <div class="body">
@@ -737,13 +772,13 @@
 
 <script>
 (function () {
-  /* Evidence chart: 1,000 screened records narrowing to 10 included studies */
+  /* Evidence chart: 1,000 records found, narrowing to 9 included studies */
   var fig = document.getElementById('evidence');
   var svg = document.getElementById('evidence-grid');
   if (fig && svg) {
     var NS = 'http://www.w3.org/2000/svg';
     var COLS = 50, ROWS = 20, STEP = 10, SIZE = 8;
-    var picks = [[4, 3], [10, 14], [15, 7], [21, 17], [25, 2], [29, 11], [34, 5], [38, 15], [42, 9], [46, 1]];
+    var picks = [[4, 3], [10, 14], [15, 7], [21, 17], [25, 2], [29, 11], [34, 5], [38, 15], [42, 9]];
     var included = {};
     picks.forEach(function (p) { included[p[1] * COLS + p[0]] = true; });
     var rest = document.createDocumentFragment();

@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NHS Watch: England’s NHS against its own targets</title>
+<meta name="description" content="An independent monthly tracker of NHS performance in England against its own targets, and of the reforms changing how the NHS is run.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+  :root {
+    --paper: #FFFFFF;
+    --paper-2: #F3F6F8;
+    --ink: #102A43;
+    --ink-2: #51667B;
+    --rule: #DCE3EA;
+    --track: #C3CFDA;
+    --target: #0B7472;
+    --gap: #B4473B;
+    --gap-tint: rgba(180, 71, 59, 0.18);
+    --met: #2E7B4E;
+    --met-tint: rgba(46, 123, 78, 0.18);
+    --chip-parl-bg: #FBEFD9; --chip-parl-ink: #74500F;
+    --chip-way-bg: #DDF0EF;  --chip-way-ink: #0A5E5C;
+    --chip-force-bg: #E1F1E6; --chip-force-ink: #24613D;
+    --chip-comm-bg: #E8EDF2; --chip-comm-ink: #3F5468;
+    color-scheme: light;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0D141B; --paper-2: #131C25; --ink: #E6EDF4; --ink-2: #9DB0C2;
+      --rule: #24313E; --track: #3A4A5A; --target: #46B9B4; --gap: #E8806F;
+      --gap-tint: rgba(232, 128, 111, 0.24); --met: #6DC593; --met-tint: rgba(109, 197, 147, 0.24);
+      --chip-parl-bg: #3A2E14; --chip-parl-ink: #F1C778; --chip-way-bg: #10302F; --chip-way-ink: #7FD6D1;
+      --chip-force-bg: #14301F; --chip-force-ink: #93D8AE; --chip-comm-bg: #1E2A36; --chip-comm-ink: #B8C7D6;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0D141B; --paper-2: #131C25; --ink: #E6EDF4; --ink-2: #9DB0C2;
+    --rule: #24313E; --track: #3A4A5A; --target: #46B9B4; --gap: #E8806F;
+    --gap-tint: rgba(232, 128, 111, 0.24); --met: #6DC593; --met-tint: rgba(109, 197, 147, 0.24);
+    --chip-parl-bg: #3A2E14; --chip-parl-ink: #F1C778; --chip-way-bg: #10302F; --chip-way-ink: #7FD6D1;
+    --chip-force-bg: #14301F; --chip-force-ink: #93D8AE; --chip-comm-bg: #1E2A36; --chip-comm-ink: #B8C7D6;
+    color-scheme: dark;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  *, *::before, *::after { box-sizing: inherit; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+    text-rendering: optimizeLegibility;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 40px); }
+  a { color: var(--target); text-underline-offset: 2px; text-decoration-thickness: 1px; }
+  a:hover { text-decoration-thickness: 2px; }
+  a:focus-visible { outline: 2px solid var(--target); outline-offset: 2px; border-radius: 2px; }
+
+  header.site {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline;
+    gap: 6px 24px; padding: 26px 0 14px; border-bottom: 1px solid var(--rule);
+  }
+  .brand { margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
+  .tagline { margin: 2px 0 0; color: var(--ink-2); font-size: 15px; }
+  .meta { margin: 0; color: var(--ink-2); font-size: 14px; }
+
+  .hero { padding: clamp(28px, 6vw, 56px) 0 28px; }
+  .hero h1 {
+    margin: 0 0 18px; max-width: 21ch;
+    font-size: clamp(30px, 5.2vw, 50px); line-height: 1.06; letter-spacing: -0.022em; font-weight: 700;
+  }
+  .lede { margin: 0 0 26px; max-width: 66ch; font-size: 18px; color: var(--ink-2); }
+  .lede strong { color: var(--ink); }
+  figure { margin: 0; }
+  .chart { width: 100%; }
+  .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 12px; font-size: 14px; color: var(--ink-2); }
+  .key { display: inline-flex; align-items: center; gap: 8px; }
+  .key i { display: inline-block; width: 24px; height: 0; border-top: 3px solid currentColor; }
+  .key.actual i { color: var(--ink); }
+  .key.needed i { color: var(--target); }
+  .key.trend i { color: var(--gap); border-top-style: dashed; }
+  .key.std i { color: var(--track); border-top-width: 2px; border-top-style: dotted; }
+  .caveat { margin: 10px 0 0; font-size: 14px; color: var(--ink-2); max-width: 70ch; }
+
+  section.block { padding: 40px 0; border-top: 1px solid var(--rule); }
+  h2 { margin: 0 0 6px; font-size: 27px; line-height: 1.2; letter-spacing: -0.012em; }
+  .intro { margin: 0 0 18px; max-width: 66ch; color: var(--ink-2); }
+  h3.group { margin: 26px 0 0; font-size: 15px; font-weight: 700; color: var(--ink-2); }
+
+  .vitals { list-style: none; margin: 0; padding: 0; }
+  .vital {
+    display: grid; grid-template-columns: minmax(0, 1.15fr) 150px minmax(0, 1.65fr);
+    gap: 6px 26px; align-items: center; padding: 16px 0 14px; border-bottom: 1px solid var(--rule);
+  }
+  .vital .name { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.3; }
+  .vital .when { margin: 2px 0 0; font-size: 14px; color: var(--ink-2); }
+  .vital .value { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.015em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .vital .bar { min-width: 0; }
+  .vital .bar svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .vital .note { grid-column: 1 / -1; margin: 2px 0 0; font-size: 14.5px; color: var(--ink-2); max-width: 80ch; }
+  .src { white-space: nowrap; }
+
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-top: 1px solid var(--rule); }
+  table { width: 100%; min-width: 820px; border-collapse: collapse; font-size: 15px; line-height: 1.45; }
+  th, td { text-align: left; vertical-align: top; padding: 14px 18px 14px 0; border-bottom: 1px solid var(--rule); }
+  th { font-size: 14px; font-weight: 700; color: var(--ink-2); }
+  td.reform { font-weight: 700; width: 17%; }
+  td.status { width: 12%; }
+  .chip { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .chip.parl { background: var(--chip-parl-bg); color: var(--chip-parl-ink); }
+  .chip.way { background: var(--chip-way-bg); color: var(--chip-way-ink); }
+  .chip.force { background: var(--chip-force-bg); color: var(--chip-force-ink); }
+  .chip.comm { background: var(--chip-comm-bg); color: var(--chip-comm-ink); }
+  td .cites { display: block; margin-top: 4px; font-size: 13.5px; }
+  td .cites a { margin-right: 10px; }
+
+  .method p { max-width: 70ch; margin: 0 0 14px; }
+  .method .links a { margin-right: 14px; white-space: nowrap; }
+
+  footer { padding: 26px 0 44px; border-top: 1px solid var(--rule); font-size: 14px; color: var(--ink-2); }
+  footer p { margin: 0 0 6px; max-width: 80ch; }
+
+  svg text { font-family: inherit; }
+  .ax { fill: var(--ink-2); font-size: 13px; }
+  .grid { stroke: var(--rule); stroke-width: 1; }
+  .lbl { fill: var(--ink); font-size: 14px; font-weight: 700; }
+  .lbl-soft { fill: var(--ink-2); font-size: 13px; }
+  .lbl-gap { fill: var(--gap); font-size: 14px; font-weight: 700; }
+  .lbl-target { fill: var(--target); font-size: 14px; font-weight: 700; }
+  .bar-target { fill: var(--target); font-size: 12.5px; font-weight: 700; }
+  .bar-end { fill: var(--ink-2); font-size: 12px; }
+  .bar-ctx { fill: var(--ink-2); font-size: 12.5px; }
+
+  @media (max-width: 760px) {
+    .vital { grid-template-columns: minmax(0, 1fr) auto; }
+    .vital .bar { grid-column: 1 / -1; }
+    .vital .value { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="site">
+    <div>
+      <p class="brand">NHS Watch</p>
+      <p class="tagline">England’s health service, measured against its own targets.</p>
+    </div>
+    <p class="meta" id="meta"></p>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title"></h1>
+      <p class="lede" id="lede"></p>
+      <figure>
+        <div class="chart" id="glide"></div>
+        <figcaption>
+          <div class="legend" aria-hidden="true">
+            <span class="key actual"><i></i>Actual</span>
+            <span class="key needed"><i></i>Needed to hit the targets</span>
+            <span class="key trend"><i></i>Last year’s pace, continued</span>
+            <span class="key std"><i></i>92% standard</span>
+          </div>
+          <p class="caveat" id="glide-caveat"></p>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="block" aria-labelledby="vitals-title">
+      <h2 id="vitals-title">Vital signs</h2>
+      <p class="intro">Each line is a headline measure, read like an observation chart. Better is always to the right, and the shaded stretch is the distance still to travel to the next target.</p>
+      <div id="vitals"></div>
+    </section>
+
+    <section class="block" aria-labelledby="reforms-title">
+      <h2 id="reforms-title">Reforms in progress</h2>
+      <p class="intro" id="reforms-intro"></p>
+      <div class="table-scroll">
+        <table id="reforms">
+          <thead>
+            <tr><th scope="col">Reform</th><th scope="col">What it changes</th><th scope="col">Status</th><th scope="col">Where it stands</th><th scope="col">Next step</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="block method" aria-labelledby="method-title">
+      <h2 id="method-title">How this is built</h2>
+      <p>All performance figures are NHS England’s official monthly statistics for England, taken from the publications and analyses linked beside each measure. The waiting list includes NHS England’s estimates for trusts that did not submit data, and A&amp;E figures cover all types of department.</p>
+      <p>Targets for 2026/27 to 2028/29 come from the NHS Medium Term Planning Framework. The 18-week projection is a straight line through the past 12 months. It shows the pace the targets demand, and it is not a forecast.</p>
+      <p id="release-note"></p>
+      <p class="links">Primary data:
+        <a href="https://www.england.nhs.uk/statistics/statistical-work-areas/rtt-waiting-times/">waiting times</a>
+        <a href="https://www.england.nhs.uk/statistics/statistical-work-areas/ae-waiting-times-and-activity/">A&amp;E</a>
+        <a href="https://www.england.nhs.uk/statistics/statistical-work-areas/cancer-waiting-times/">cancer</a>
+        <a href="https://www.england.nhs.uk/statistics/statistical-work-areas/diagnostics-waiting-times-and-activity/">diagnostics</a>
+        <a href="https://www.england.nhs.uk/statistics/statistical-work-areas/ambulance-quality-indicators/">ambulances</a>
+        <a href="https://nhsproviders.org/resources/on-the-day-briefing-medium-term-planning-framework-2026-2029">planning targets</a>
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Built with AI assistance and maintained by <a href="./">Akshat Khurana</a>, MSc Health Policy, Planning and Financing (LSE and LSHTM).</p>
+    <p>An independent project, not affiliated with or endorsed by the NHS.</p>
+  </footer>
+</div>
+
+<script>
+/* ================================================================
+   DATA. Update this block each month after NHS England's release.
+   Everything on the page is drawn from it.
+   ================================================================ */
+const DATA = {
+  updated: "29 October 2026",
+  nextRelease: "Thursday 12 November 2026",
+  coverage: "A&E and ambulance figures run to September 2026, waiting times and cancer to August 2026, and diagnostics to July 2026.",
+
+  rtt: {
+    actual: [
+      { month: "2025-08", value: 60.9 },
+      { month: "2026-08", value: 65.2 }
+    ],
+    milestones: [
+      { month: "2027-03", value: 70 },
+      { month: "2029-03", value: 92 }
+    ],
+    standard: 92
+  },
+
+  groups: [
+    { title: "Planned care", items: [
+      { name: "Planned hospital care waiting list", when: "August 2026", display: "7.37m",
+        value: 7.37, min: 6.0, max: 8.0, better: "lower", unit: "m", context: { value: 7.77, label: "Record, Sep 2023" },
+        note: "About 6.24 million people, up around 42,000 cases on July. The record was nearly 7.8 million in September 2023.",
+        sources: [
+          { label: "BMA", url: "https://www.bma.org.uk/advice-and-support/nhs-delivery-and-workforce/pressures/nhs-backlog-data-analysis" },
+          { label: "Nuffield Trust", url: "https://www.nuffieldtrust.org.uk/qualitywatch/nhs-performance-dashboard" },
+          { label: "Commons Library", url: "https://researchbriefings.files.parliament.uk/documents/CBP-7281/CBP-7281.pdf" }
+        ] },
+      { name: "Patients waiting under 18 weeks", when: "August 2026", display: "65.2%",
+        value: 65.2, min: 50, max: 100, better: "higher", unit: "%",
+        targets: [ { value: 70, label: "70% by Mar 2027" }, { value: 92, label: "92% by Mar 2029" } ],
+        note: "Up from 60.9% a year earlier. About 2.56 million people had waited longer than 18 weeks.",
+        sources: [
+          { label: "NHS waiting trends", url: "https://nhswaithelper.co.uk/waiting-times/trends" },
+          { label: "BMA", url: "https://www.bma.org.uk/advice-and-support/nhs-delivery-and-workforce/pressures/nhs-backlog-data-analysis" }
+        ] },
+      { name: "People waiting more than a year", when: "August 2026", display: "113,000",
+        value: 1.53, min: 0, max: 3, better: "lower", unit: "%",
+        targets: [ { value: 1, label: "Aim was under 1% by Mar 2026" } ],
+        note: "About 1.5% of the waiting list, up from roughly 106,000 people in July.",
+        sources: [
+          { label: "BMA", url: "https://www.bma.org.uk/advice-and-support/nhs-delivery-and-workforce/pressures/nhs-backlog-data-analysis" },
+          { label: "2025/26 aims", url: "https://bradford.moderngov.co.uk/documents/s54682/1a.%20Appendix%20-%20peformance%20reportv2.pdf" }
+        ] },
+      { name: "Waiting more than 6 weeks for a diagnostic test", when: "July 2026", display: "23.1%",
+        value: 23.1, min: 0, max: 40, better: "lower", unit: "%",
+        targets: [ { value: 20, label: "20% or better by Mar 2027" }, { value: 1, label: "1% by 2028/29" } ],
+        note: "The 1% standard was last met in November 2013.",
+        sources: [
+          { label: "Commons Library", url: "https://commonslibrary.parliament.uk/research-briefings/cbp-7281/" }
+        ] }
+    ] },
+    { title: "Urgent and emergency care", items: [
+      { name: "A&E patients seen within 4 hours", when: "September 2026", display: "74.4%",
+        value: 74.4, min: 50, max: 100, better: "higher", unit: "%",
+        targets: [ { value: 82, label: "82% by Mar 2027" }, { value: 85, label: "85% in 2028/29" } ],
+        note: "Down from 75.0% in August. Over 10% of A&E patients spent more than 12 hours there, a level last seen in February 2026.",
+        sources: [
+          { label: "BMA", url: "https://www.bma.org.uk/advice-and-support/nhs-delivery-and-workforce/pressures/nhs-backlog-data-analysis" },
+          { label: "Nuffield Trust", url: "https://www.nuffieldtrust.org.uk/qualitywatch/nhs-performance-dashboard" }
+        ] },
+      { name: "Ambulance response to Category 2 calls, such as strokes", when: "September 2026, average", display: "31.3 min",
+        value: 31.3, min: 0, max: 45, better: "lower", unit: " min",
+        targets: [ { value: 25, label: "25 min in 2026/27" }, { value: 18, label: "18 min by 2028/29" } ],
+        note: "Slower than a year earlier, when the average was 30 minutes 46 seconds. The constitutional standard is 18 minutes.",
+        sources: [
+          { label: "NHS England", url: "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2026/10/20261008-AQI-Stats-Note-jwk45.pdf" },
+          { label: "NHS Providers", url: "https://nhsproviders.org/resources/nhs-activity-tracker-october-2025/ambulance-sector" },
+          { label: "Targets", url: "https://thenhsalliance.org/resources/on-the-day-briefing-medium-term-planning-framework-2026-2029" }
+        ] }
+    ] },
+    { title: "Cancer", items: [
+      { name: "Cancer patients treated within 62 days of urgent referral", when: "August 2026", display: "71.9%",
+        value: 71.9, min: 50, max: 100, better: "higher", unit: "%",
+        targets: [ { value: 85, label: "85% by 2028/29" } ],
+        note: "Up from 71.2% in July. NHS England had aimed for 75% by March 2026.",
+        sources: [
+          { label: "BMA", url: "https://www.bma.org.uk/advice-and-support/nhs-delivery-and-workforce/pressures/nhs-backlog-data-analysis" }
+        ] }
+    ] }
+  ],
+
+  reforms: [
+    { reform: "Abolishing NHS England", change: "The Health Bill moves NHS England’s functions to a restructured DHSC or to other parts of the system.",
+      status: "In Parliament", stands: "Lords second reading was scheduled for 13 October 2026, and committee-stage amendments have been tabled since.",
+      next: "Royal Assent, with the merged department due to start in April 2027.",
+      cites: [
+        { label: "DHSC", url: "https://www.gov.uk/government/publications/health-bill-role-and-functions-of-the-restructured-dhsc-fact-sheet/health-bill-role-and-functions-of-the-restructured-dhsc-fact-sheet" },
+        { label: "Weightmans", url: "https://www.weightmans.com/media-centre/news/health-bill-2026-reform-moves-closer/" },
+        { label: "Lords amendments", url: "https://bills.parliament.uk/publications/68145/documents/8919" }
+      ] },
+    { reform: "Merging DHSC and NHS England", change: "One leaner department, with NHS England’s 15,000-strong headcount expected to halve.",
+      status: "Under way", stands: "Detailed design ran from March to August 2026, and a consultation on the new DHSC was scheduled for October and November.",
+      next: "New DHSC operating from April 2027.",
+      cites: [ { label: "Civil Service World", url: "https://www.civilserviceworld.com/news/article/dhsc-details-timeline-for-completion-of-nhs-england-merger" } ] },
+    { reform: "ICBs as strategic commissioners", change: "Integrated care boards refocus on planning and buying care for their local populations.",
+      status: "In Parliament", stands: "Set out in the Health Bill alongside the abolition of NHS England.",
+      next: "Depends on the Bill’s passage.",
+      cites: [ { label: "DHSC", url: "https://www.gov.uk/government/publications/health-bill-oversight-of-the-health-system-fact-sheet/health-bill-oversight-of-the-health-system-fact-sheet" } ] },
+    { reform: "Single patient record", change: "One record of each patient’s care, shared across services.",
+      status: "In Parliament", stands: "Included in the Health Bill introduced to the Commons in May 2026.",
+      next: "Depends on the Bill’s passage.",
+      cites: [
+        { label: "Healthcare and Protection", url: "https://healthcareandprotection.com/bill-abolishing-nhs-england-and-introducing-single-patient-records-enters-commons/" },
+        { label: "King’s Fund", url: "https://www.kingsfund.org.uk/insight-and-analysis/projects/nhs-modernisation-bill-2026" }
+      ] },
+    { reform: "Maternity and neonatal commissioner", change: "A statutory commissioner for maternity and neonatal safety.",
+      status: "Committed", stands: "The government has committed to adding it to the Health Bill in the Lords.",
+      next: "A Lords amendment to the Bill.",
+      cites: [ { label: "Weightmans", url: "https://www.weightmans.com/media-centre/news/health-bill-2026-reform-moves-closer/" } ] },
+    { reform: "Medium Term Planning Framework", change: "Three years of NHS targets, 2026/27 to 2028/29, including those on this page.",
+      status: "In force", stands: "Published on 24 October 2025.",
+      next: "Year-two milestones in March 2027.",
+      cites: [ { label: "NHS Providers", url: "https://nhsproviders.org/resources/on-the-day-briefing-medium-term-planning-framework-2026-2029" } ] },
+    { reform: "NICE threshold raised", change: "New medicines are judged against £25,000 to £35,000 per QALY, up from £20,000 to £30,000.",
+      status: "In force", stands: "Applies to technology appraisals from April 2026, the first change since NICE was founded in 1999.",
+      next: "A new EQ-5D-5L value set for QALYs.",
+      cites: [
+        { label: "NICE", url: "https://www.nice.org.uk/what-nice-does/faqs/changes-to-nice-s-cost-effectiveness-thresholds" },
+        { label: "Pharmaceutical Journal", url: "https://pharmaceutical-journal.com/article/news/nice-cost-effectiveness-thresholds-increased-as-uk-strikes-trade-deal-with-united-states" }
+      ] },
+    { reform: "Two-child limit removed", change: "Universal Credit pays the child element for every child, a wider determinant of family health.",
+      status: "In force", stands: "In effect from 6 April 2026, at £303.94 a month per child.",
+      next: "Evidence on outcomes for larger families.",
+      cites: [
+        { label: "Contact", url: "https://contact.org.uk/about-contact/news-and-views/contact-welcomes-abolition-of-the-two-child-limit/" },
+        { label: "Legislation", url: "https://legislation.gov.uk/ukpga/2026/13/" }
+      ] }
+  ]
+};
+
+/* ================================================================
+   Helpers
+   ================================================================ */
+const NS = "http://www.w3.org/2000/svg";
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const idx = m => { const p = m.split("-").map(Number); return p[0] * 12 + (p[1] - 1); };
+const monthName = i => MONTHS[Math.floor(i) % 12] + " " + Math.floor(Math.floor(i) / 12);
+const shortMonth = i => SHORT[Math.floor(i) % 12] + " " + Math.floor(Math.floor(i) / 12);
+const period = i => { const mo = Math.floor(i) % 12, y = Math.floor(Math.floor(i) / 12); return (mo < 4 ? "early " : mo < 8 ? "mid-" : "late ") + y; };
+const f1 = v => (Math.round(v * 10) / 10).toFixed(1);
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text != null) e.textContent = text;
+  return e;
+}
+function html(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+
+/* ================================================================
+   18-week model and hero text
+   ================================================================ */
+function rttModel() {
+  const r = DATA.rtt, a = r.actual;
+  const first = a[0], last = a[a.length - 1];
+  const span = idx(last.month) - idx(first.month);
+  const pace = (last.value - first.value) / span;
+  const mid = r.milestones[0], end = r.milestones[r.milestones.length - 1];
+  const toEnd = idx(end.month) - idx(last.month);
+  const toMid = idx(mid.month) - idx(last.month);
+  return {
+    first, last, pace, mid, end,
+    gain: last.value - first.value,
+    needed: (end.value - last.value) / toEnd,
+    atEnd: last.value + pace * toEnd,
+    atMid: last.value + pace * toMid,
+    cross: pace > 0 ? idx(last.month) + (r.standard - last.value) / pace : null
+  };
+}
+
+function writeHero(M) {
+  const endName = monthName(idx(M.end.month));
+  const h1 = document.getElementById("hero-title");
+  if (M.cross === null) {
+    h1.textContent = "At last year’s pace, the 18-week standard is never reached.";
+  } else if (M.cross > idx(M.end.month)) {
+    h1.textContent = "At last year’s pace, the 18-week standard arrives in " + period(M.cross) + ", not " + endName + ".";
+  } else {
+    h1.textContent = "At last year’s pace, the 18-week standard arrives by " + period(M.cross) + ", in time for " + endName + ".";
+  }
+  const midName = monthName(idx(M.mid.month));
+  const midVerdict = M.atMid >= M.mid.value ? "ahead of" : "short of";
+  document.getElementById("lede").innerHTML =
+    "In " + monthName(idx(M.last.month)) + ", <strong>" + f1(M.last.value) + "%</strong> of people waiting for planned hospital care had waited under 18 weeks, up " + f1(M.gain) + " points in a year. " +
+    "Hitting " + DATA.rtt.standard + "% by " + endName + " needs " + M.needed.toFixed(2) + " points a month, " + (M.needed / M.pace).toFixed(1) + " times the recent pace. " +
+    "On the same trend, " + endName + " arrives at about " + Math.round(M.atEnd) + "%, and " + midName + " at about " + f1(M.atMid) + "%, " + midVerdict + " its " + M.mid.value + "% milestone.";
+  document.getElementById("glide-caveat").textContent =
+    "Straight-line projection of the change between " + monthName(idx(M.first.month)) + " and " + monthName(idx(M.last.month)) + ". It shows the pace the targets demand, not a forecast.";
+}
+
+/* ================================================================
+   Hero chart: the glide path
+   ================================================================ */
+function renderGlide(M) {
+  const host = document.getElementById("glide");
+  host.innerHTML = "";
+  const W = Math.max(300, Math.round(host.clientWidth));
+  const narrow = W < 620;
+  const H = narrow ? 300 : 400;
+  const m = { t: 26, r: narrow ? 14 : 24, b: 38, l: 44 };
+  const x0 = idx("2025-06"), x1 = idx("2033-03");
+  const yMin = 55, yMax = 100;
+  const X = i => m.l + (i - x0) / (x1 - x0) * (W - m.l - m.r);
+  const Y = v => m.t + (yMax - v) / (yMax - yMin) * (H - m.t - m.b);
+
+  const svg = el("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img",
+    "aria-label": "Line chart of the share of patients waiting under 18 weeks. Actual: " + f1(M.first.value) + "% in " + monthName(idx(M.first.month)) + " and " + f1(M.last.value) + "% in " + monthName(idx(M.last.month)) + ". The path needed reaches " + M.mid.value + "% by " + monthName(idx(M.mid.month)) + " and " + M.end.value + "% by " + monthName(idx(M.end.month)) + "." + (M.cross ? " At last year’s pace, 92% is reached in " + period(M.cross) + "." : "") });
+
+  // Gridlines and y labels
+  for (let v = 60; v <= 100; v += 10) {
+    svg.appendChild(el("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), class: "grid" }));
+    svg.appendChild(el("text", { x: m.l - 8, y: Y(v) + 4, "text-anchor": "end", class: "ax" }, v + "%"));
+  }
+  // x labels: January of each year
+  for (let y = 2026; y <= 2033; y++) {
+    if (narrow && y % 2 === 1) continue;
+    const xi = X(y * 12);
+    svg.appendChild(el("line", { x1: xi, x2: xi, y1: H - m.b, y2: H - m.b + 5, stroke: "var(--track)" }));
+    svg.appendChild(el("text", { x: xi, y: H - m.b + 22, "text-anchor": "middle", class: "ax" }, String(y)));
+  }
+
+  // 92% standard
+  const ys = Y(DATA.rtt.standard);
+  svg.appendChild(el("line", { x1: m.l, x2: W - m.r, y1: ys, y2: ys, stroke: "var(--track)", "stroke-width": 2, "stroke-dasharray": "2 5", "stroke-linecap": "round" }));
+  svg.appendChild(el("text", { x: m.l + 6, y: ys - 8, class: "lbl-soft" }, "92% standard"));
+
+  const lastI = idx(M.last.month), midI = idx(M.mid.month), endI = idx(M.end.month);
+
+  // Needed path
+  const needPts = [[lastI, M.last.value], [midI, M.mid.value], [endI, M.end.value]].map(p => X(p[0]) + "," + Y(p[1])).join(" ");
+  svg.appendChild(el("polyline", { points: needPts, fill: "none", stroke: "var(--target)", "stroke-width": 3, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+
+  // Trend continued
+  if (M.cross) {
+    svg.appendChild(el("line", { x1: X(lastI), y1: Y(M.last.value), x2: X(M.cross), y2: ys, stroke: "var(--gap)", "stroke-width": 3, "stroke-dasharray": "7 6", "stroke-linecap": "round" }));
+    const endDot = el("circle", { cx: X(M.cross), cy: ys, r: 5.5, fill: "var(--paper)", stroke: "var(--gap)", "stroke-width": 2.5 });
+    endDot.appendChild(el("title", {}, "92% reached around " + monthName(M.cross) + " at last year’s pace"));
+    svg.appendChild(endDot);
+    if (!narrow) {
+      svg.appendChild(el("text", { x: X(M.cross), y: ys - 12, "text-anchor": "end", class: "lbl-gap" }, "92% in " + period(M.cross) + " on trend"));
+    }
+  }
+
+  // Deadline gap annotation
+  const xd = X(endI), yTrendEnd = Y(M.atEnd);
+  svg.appendChild(el("line", { x1: xd, x2: xd, y1: Y(M.end.value) + 7, y2: yTrendEnd - 7, stroke: "var(--ink-2)", "stroke-width": 1.5, "stroke-dasharray": "1 4", "stroke-linecap": "round" }));
+  const trendDot = el("circle", { cx: xd, cy: yTrendEnd, r: 5, fill: "var(--paper)", stroke: "var(--gap)", "stroke-width": 2.5 });
+  trendDot.appendChild(el("title", {}, f1(M.atEnd) + "% by " + monthName(endI) + " at last year’s pace"));
+  svg.appendChild(trendDot);
+  if (!narrow) {
+    const gapPts = Math.round(M.end.value - M.atEnd);
+    svg.appendChild(el("text", { x: xd + 10, y: (Y(M.end.value) + yTrendEnd) / 2 - 14, class: "lbl" }, gapPts + "-point gap at the deadline"));
+    svg.appendChild(el("text", { x: xd + 10, y: yTrendEnd + 18, class: "lbl-gap" }, Math.round(M.atEnd) + "% by " + shortMonth(endI) + " on trend"));
+  }
+
+  // Milestones
+  [[midI, M.mid.value], [endI, M.end.value]].forEach((p, k) => {
+    const c = el("circle", { cx: X(p[0]), cy: Y(p[1]), r: 6, fill: "var(--paper)", stroke: "var(--target)", "stroke-width": 3 });
+    c.appendChild(el("title", {}, p[1] + "% target by " + monthName(p[0])));
+    svg.appendChild(c);
+    if (k === 1) {
+      svg.appendChild(el("text", { x: X(p[0]), y: Y(p[1]) - 14, "text-anchor": "middle", class: "lbl-target" }, p[1] + "% by " + shortMonth(p[0])));
+    } else if (!narrow) {
+      svg.appendChild(el("text", { x: X(p[0]) - 10, y: Y(p[1]) - 10, "text-anchor": "end", class: "lbl-target" }, p[1] + "% by " + shortMonth(p[0])));
+    }
+  });
+
+  // Actual
+  const a = DATA.rtt.actual;
+  const actPts = a.map(p => X(idx(p.month)) + "," + Y(p.value)).join(" ");
+  svg.appendChild(el("polyline", { points: actPts, fill: "none", stroke: "var(--ink)", "stroke-width": 3.5, "stroke-linecap": "round", "stroke-linejoin": "round" }));
+  a.forEach((p, k) => {
+    const c = el("circle", { cx: X(idx(p.month)), cy: Y(p.value), r: 5, fill: "var(--ink)", stroke: "var(--paper)", "stroke-width": 2 });
+    c.appendChild(el("title", {}, f1(p.value) + "% in " + monthName(idx(p.month))));
+    svg.appendChild(c);
+    const last = k === a.length - 1;
+    if (!narrow || last) {
+      svg.appendChild(el("text", { x: X(idx(p.month)) + (last ? 10 : -4), y: Y(p.value) + 22, "text-anchor": "start", class: "lbl" }, f1(p.value) + "% in " + shortMonth(idx(p.month))));
+    }
+  });
+
+  host.appendChild(svg);
+}
+
+/* ================================================================
+   Vital signs: one observation-chart row per measure
+   ================================================================ */
+function fmtVal(v, unit) {
+  if (unit === "m") return v.toFixed(1) + "m";
+  return (Number.isInteger(v) ? v : f1(v)) + unit;
+}
+
+function renderBar(host, d) {
+  host.innerHTML = "";
+  const W = Math.max(240, Math.round(host.clientWidth));
+  const H = 62, pad = 10, y = 26;
+  const pos = v => {
+    const t = Math.max(0, Math.min(1, (v - d.min) / (d.max - d.min)));
+    return pad + (d.better === "higher" ? t : 1 - t) * (W - 2 * pad);
+  };
+  const svg = el("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, "aria-hidden": "true" });
+
+  // Scale ends: worse on the left, better on the right
+  const leftV = d.better === "higher" ? d.min : d.max, rightV = d.better === "higher" ? d.max : d.min;
+  svg.appendChild(el("text", { x: pad, y: y - 13, class: "bar-end" }, fmtVal(leftV, d.unit)));
+  svg.appendChild(el("text", { x: W - pad, y: y - 13, "text-anchor": "end", class: "bar-end" }, fmtVal(rightV, d.unit)));
+  svg.appendChild(el("line", { x1: pad, x2: W - pad, y1: y, y2: y, stroke: "var(--track)", "stroke-width": 2, "stroke-linecap": "round" }));
+
+  const xv = pos(d.value);
+  if (d.targets && d.targets.length) {
+    const t0 = d.targets[0].value, xt = pos(t0);
+    const met = d.better === "higher" ? d.value >= t0 : d.value <= t0;
+    svg.appendChild(el("rect", { x: Math.min(xv, xt), y: y - 6, width: Math.abs(xt - xv), height: 12, rx: 2, fill: met ? "var(--met-tint)" : "var(--gap-tint)" }));
+    d.targets.forEach((t, k) => {
+      const xt2 = pos(t.value);
+      svg.appendChild(el("line", { x1: xt2, x2: xt2, y1: y - 11, y2: y + 11, stroke: "var(--target)", "stroke-width": 2.5, "stroke-linecap": "round" }));
+      const approx = t.label.length * 6.6;
+      let anchor = "middle", tx = xt2;
+      if (d.targets.length > 1) { anchor = k === 0 ? "end" : "start"; tx = k === 0 ? xt2 - 6 : xt2 + 6; }
+      if (anchor === "start" && tx + approx > W) { anchor = "end"; tx = xt2 - 6; }
+      if (anchor === "end" && tx - approx < 0) { anchor = "start"; tx = xt2 + 6; }
+      if (anchor === "middle") {
+        if (xt2 - approx / 2 < 0) { anchor = "start"; tx = Math.max(0, xt2 - 4); }
+        else if (xt2 + approx / 2 > W) { anchor = "end"; tx = Math.min(W, xt2 + 4); }
+      }
+      svg.appendChild(el("text", { x: tx, y: y + 28, "text-anchor": anchor, class: "bar-target" }, t.label));
+    });
+  }
+  if (d.context) {
+    const xc = pos(d.context.value);
+    svg.appendChild(el("line", { x1: xc, x2: xc, y1: y - 9, y2: y + 9, stroke: "var(--ink-2)", "stroke-width": 2, "stroke-linecap": "round" }));
+    const left = xc < W / 2;
+    svg.appendChild(el("text", { x: left ? Math.max(0, xc - 4) : xc + 4, y: y + 28, "text-anchor": left ? "start" : "end", class: "bar-ctx" }, d.context.label));
+  }
+  svg.appendChild(el("circle", { cx: xv, cy: y, r: 7, fill: "var(--ink)", stroke: "var(--paper)", "stroke-width": 2.5 }));
+  host.appendChild(svg);
+}
+
+const bars = [];
+function buildVitals() {
+  const host = document.getElementById("vitals");
+  DATA.groups.forEach(g => {
+    host.appendChild(html("h3", "group", g.title));
+    const ul = html("ul", "vitals");
+    g.items.forEach(d => {
+      const li = html("li", "vital");
+      const head = html("div");
+      head.appendChild(html("p", "name", d.name));
+      head.appendChild(html("p", "when", d.when));
+      li.appendChild(head);
+      li.appendChild(html("p", "value", d.display));
+      const bar = html("div", "bar");
+      li.appendChild(bar);
+      const note = html("p", "note", d.note + " ");
+      const src = html("span", "src", "Source: ");
+      d.sources.forEach((s, k) => {
+        const a = html("a", null, s.label); a.href = s.url;
+        src.appendChild(a);
+        if (k < d.sources.length - 1) src.appendChild(document.createTextNode(", "));
+      });
+      note.appendChild(src);
+      li.appendChild(note);
+      ul.appendChild(li);
+      bars.push({ host: bar, d });
+    });
+    host.appendChild(ul);
+  });
+}
+
+/* ================================================================
+   Reforms table
+   ================================================================ */
+const STATUS = { "In Parliament": "parl", "Under way": "way", "In force": "force", "Committed": "comm" };
+function buildReforms() {
+  document.getElementById("reforms-intro").textContent =
+    "The structural changes reshaping how the NHS in England is run, and the policy shifts around it, as of " + DATA.updated + ".";
+  const tbody = document.querySelector("#reforms tbody");
+  DATA.reforms.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.appendChild(html("td", "reform", r.reform));
+    tr.appendChild(html("td", null, r.change));
+    const st = html("td", "status"); st.appendChild(html("span", "chip " + (STATUS[r.status] || "comm"), r.status)); tr.appendChild(st);
+    const where = html("td", null, r.stands);
+    const cites = html("span", "cites");
+    r.cites.forEach(c => { const a = html("a", null, c.label); a.href = c.url; cites.appendChild(a); });
+    where.appendChild(cites);
+    tr.appendChild(where);
+    tr.appendChild(html("td", null, r.next));
+    tbody.appendChild(tr);
+  });
+}
+
+/* ================================================================
+   Boot
+   ================================================================ */
+const MODEL = rttModel();
+document.getElementById("meta").textContent = "Updated " + DATA.updated + ". Next NHS England data expected " + DATA.nextRelease.replace(/^Thursday /, "") + ".";
+document.getElementById("release-note").textContent = DATA.coverage + " NHS England publishes new figures monthly, usually on the second Thursday, and the next release is expected on " + DATA.nextRelease + ".";
+writeHero(MODEL);
+buildVitals();
+buildReforms();
+
+function drawAll() {
+  renderGlide(MODEL);
+  bars.forEach(b => renderBar(b.host, b.d));
+}
+drawAll();
+let rt;
+window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+</script>
+</body>
+</html>

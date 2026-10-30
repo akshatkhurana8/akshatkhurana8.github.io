@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>India Health Watch: India’s health system against its own targets</title>
+<meta name="description" content="An independent tracker of India’s health spending, maternal and child health and nutrition against the targets India set itself.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+  :root {
+    --paper: #FFFFFF; --paper-2: #F3F6F8; --ink: #102A43; --ink-2: #51667B; --rule: #DCE3EA; --track: #C3CFDA;
+    --target: #0B7472; --gap: #B4473B; --gap-tint: rgba(180, 71, 59, 0.18); --met: #2E7B4E; --met-tint: rgba(46, 123, 78, 0.18);
+    --chip-met-bg: #E1F1E6; --chip-met-ink: #24613D; --chip-missed-bg: #F8E2DF; --chip-missed-ink: #8E3328;
+    --chip-off-bg: #FBEFD9; --chip-off-ink: #74500F; --chip-nodata-bg: #E8EDF2; --chip-nodata-ink: #3F5468;
+    color-scheme: light;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0D141B; --paper-2: #131C25; --ink: #E6EDF4; --ink-2: #9DB0C2; --rule: #24313E; --track: #3A4A5A;
+      --target: #46B9B4; --gap: #E8806F; --gap-tint: rgba(232, 128, 111, 0.24); --met: #6DC593; --met-tint: rgba(109, 197, 147, 0.24);
+      --chip-met-bg: #14301F; --chip-met-ink: #93D8AE; --chip-missed-bg: #3A1D19; --chip-missed-ink: #F2A397;
+      --chip-off-bg: #3A2E14; --chip-off-ink: #F1C778; --chip-nodata-bg: #1E2A36; --chip-nodata-ink: #B8C7D6;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0D141B; --paper-2: #131C25; --ink: #E6EDF4; --ink-2: #9DB0C2; --rule: #24313E; --track: #3A4A5A;
+    --target: #46B9B4; --gap: #E8806F; --gap-tint: rgba(232, 128, 111, 0.24); --met: #6DC593; --met-tint: rgba(109, 197, 147, 0.24);
+    --chip-met-bg: #14301F; --chip-met-ink: #93D8AE; --chip-missed-bg: #3A1D19; --chip-missed-ink: #F2A397;
+    --chip-off-bg: #3A2E14; --chip-off-ink: #F1C778; --chip-nodata-bg: #1E2A36; --chip-nodata-ink: #B8C7D6;
+    color-scheme: dark;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  *, *::before, *::after { box-sizing: inherit; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px; line-height: 1.55; text-rendering: optimizeLegibility;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 40px); }
+  a { color: var(--target); text-underline-offset: 2px; text-decoration-thickness: 1px; }
+  a:hover { text-decoration-thickness: 2px; }
+  a:focus-visible { outline: 2px solid var(--target); outline-offset: 2px; border-radius: 2px; }
+
+  header.site { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 24px; padding: 26px 0 14px; border-bottom: 1px solid var(--rule); }
+  .brand { margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
+  .tagline { margin: 2px 0 0; color: var(--ink-2); font-size: 15px; }
+  .meta { margin: 0; color: var(--ink-2); font-size: 14px; }
+
+  .hero { padding: clamp(28px, 6vw, 56px) 0 28px; }
+  .hero h1 { margin: 0 0 18px; max-width: 22ch; font-size: clamp(30px, 5vw, 48px); line-height: 1.07; letter-spacing: -0.022em; }
+  .lede { margin: 0 0 26px; max-width: 66ch; font-size: 18px; color: var(--ink-2); }
+  .lede strong { color: var(--ink); }
+  figure { margin: 0; }
+  .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 12px; font-size: 14px; color: var(--ink-2); }
+  .key { display: inline-flex; align-items: center; gap: 8px; }
+  .key i { display: inline-block; width: 24px; height: 0; border-top: 3px solid currentColor; }
+  .key.actual i { color: var(--ink); }
+  .key.trend i { color: var(--gap); border-top-style: dashed; }
+  .key.std i { color: var(--target); border-top-width: 2px; border-top-style: dotted; }
+  .caveat { margin: 10px 0 0; font-size: 14px; color: var(--ink-2); max-width: 72ch; }
+
+  section.block { padding: 40px 0; border-top: 1px solid var(--rule); }
+  h2 { margin: 0 0 6px; font-size: 27px; line-height: 1.2; letter-spacing: -0.012em; }
+  .intro { margin: 0 0 18px; max-width: 66ch; color: var(--ink-2); }
+  h3.group { margin: 26px 0 0; font-size: 15px; font-weight: 700; color: var(--ink-2); }
+
+  .vitals { list-style: none; margin: 0; padding: 0; }
+  .vital { display: grid; grid-template-columns: minmax(0, 1.15fr) 150px minmax(0, 1.65fr); gap: 6px 26px; align-items: center; padding: 16px 0 14px; border-bottom: 1px solid var(--rule); }
+  .vital .name { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.3; }
+  .vital .when { margin: 2px 0 0; font-size: 14px; color: var(--ink-2); }
+  .vital .value { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.015em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .vital .value.none { color: var(--ink-2); font-size: 22px; }
+  .vital .bar { min-width: 0; }
+  .vital .bar svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .gapnote { margin: 0; padding: 10px 14px; border: 1.5px dashed var(--track); border-radius: 4px; font-size: 14.5px; color: var(--ink-2); }
+  .vital .note { grid-column: 1 / -1; margin: 2px 0 0; font-size: 14.5px; color: var(--ink-2); max-width: 80ch; }
+  .src { white-space: nowrap; }
+
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-top: 1px solid var(--rule); }
+  table { width: 100%; min-width: 780px; border-collapse: collapse; font-size: 15px; line-height: 1.45; }
+  th, td { text-align: left; vertical-align: top; padding: 14px 18px 14px 0; border-bottom: 1px solid var(--rule); }
+  th { font-size: 14px; font-weight: 700; color: var(--ink-2); }
+  td.promise { font-weight: 700; width: 24%; }
+  td.status { width: 12%; }
+  .chip { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .chip.met { background: var(--chip-met-bg); color: var(--chip-met-ink); }
+  .chip.missed { background: var(--chip-missed-bg); color: var(--chip-missed-ink); }
+  .chip.off { background: var(--chip-off-bg); color: var(--chip-off-ink); }
+  .chip.nodata { background: var(--chip-nodata-bg); color: var(--chip-nodata-ink); }
+  td .cites { display: block; margin-top: 4px; font-size: 13.5px; }
+  td .cites a { margin-right: 10px; }
+
+  .method p { max-width: 72ch; margin: 0 0 14px; }
+  footer { padding: 26px 0 44px; border-top: 1px solid var(--rule); font-size: 14px; color: var(--ink-2); }
+  footer p { margin: 0 0 6px; max-width: 80ch; }
+
+  svg text { font-family: inherit; }
+  .ax { fill: var(--ink-2); font-size: 13px; }
+  .grid { stroke: var(--rule); stroke-width: 1; }
+  .lbl { fill: var(--ink); font-size: 14px; font-weight: 700; }
+  .lbl-soft { fill: var(--ink-2); font-size: 13px; }
+  .lbl-gap { fill: var(--gap); font-size: 14px; font-weight: 700; }
+  .lbl-target { fill: var(--target); font-size: 14px; font-weight: 700; }
+  .bar-target { fill: var(--target); font-size: 12.5px; font-weight: 700; }
+  .bar-end { fill: var(--ink-2); font-size: 12px; }
+  .bar-ctx { fill: var(--ink-2); font-size: 12.5px; }
+
+  @media (max-width: 760px) {
+    .vital { grid-template-columns: minmax(0, 1fr) auto; }
+    .vital .bar { grid-column: 1 / -1; }
+    .vital .value { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="site">
+    <div>
+      <p class="brand">India Health Watch</p>
+      <p class="tagline">India’s health system, measured against the targets it set itself.</p>
+    </div>
+    <p class="meta" id="meta"></p>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title"></h1>
+      <p class="lede" id="lede"></p>
+      <figure>
+        <div class="chart" id="glide"></div>
+        <figcaption>
+          <div class="legend" aria-hidden="true">
+            <span class="key actual"><i></i>Government health spending, % of GDP</span>
+            <span class="key trend"><i></i>Ten-year trend, continued</span>
+            <span class="key std"><i></i>2.5% target</span>
+          </div>
+          <p class="caveat" id="glide-caveat"></p>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="block" aria-labelledby="vitals-title">
+      <h2 id="vitals-title">Vital signs</h2>
+      <p class="intro">Each line is a headline measure, read like an observation chart. Better is always to the right; the shaded stretch is the distance to the next target, and a grey tick shows an earlier reading.</p>
+      <div id="vitals"></div>
+    </section>
+
+    <section class="block" aria-labelledby="promises-title">
+      <h2 id="promises-title">Promises and deadlines</h2>
+      <p class="intro">Targets from the National Health Policy 2017, POSHAN Abhiyaan and the National Food Security Act, checked against the latest data.</p>
+      <div class="table-scroll">
+        <table id="promises">
+          <thead><tr><th scope="col">Promise</th><th scope="col">Made in</th><th scope="col">Deadline</th><th scope="col">Latest</th><th scope="col">Status</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="block method" aria-labelledby="method-title">
+      <h2 id="method-title">How this is built</h2>
+      <p>Figures come from official releases: the National Health Accounts prepared by the National Health Systems Resource Centre, the National Family Health Survey run by IIPS for the Ministry of Health and Family Welfare, and the Registrar General’s Sample Registration System. Each measure links to the release or summary it was taken from.</p>
+      <p>NFHS-6 results are provisional, and its fact sheet dropped several indicators, including anaemia and infant mortality. Spending shares use the old GDP base so the series stays comparable; on the new base, 2022-23 is 1.48% of GDP.</p>
+      <p id="coverage"></p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Built with AI assistance and maintained by <a href="./">Akshat Khurana</a>, MSc Health Policy, Planning and Financing (LSE and LSHTM).</p>
+    <p>An independent project, not affiliated with or endorsed by the Government of India.</p>
+  </footer>
+</div>
+
+<script>
+/* ================================================================
+   DATA. Update this block when new official figures are released.
+   ================================================================ */
+const DATA = {
+  updated: "29 October 2026",
+  coverage: "Spending runs to 2022-23, survey measures to NFHS-6 (2023-24), maternal mortality to 2022–24 and child mortality to the latest Sample Registration System figures cited.",
+
+  ghe: {
+    start: 2013, // fiscal year 2013-14
+    values: [1.15, 1.13, 1.18, 1.22, 1.35, 1.28, 1.35, 1.60, 1.84, 1.43],
+    target: 2.5, targetYear: 2025,
+    sources: [
+      { label: "NHA 2022-23", url: "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2265816&lang=1&reg=3" },
+      { label: "NHA series", url: "https://www.nhsrcindia.org/sites/default/files/2024-04/Provisional%20NHA%20Estimates.pdf" }
+    ]
+  },
+
+  groups: [
+    { title: "Paying for care", items: [
+      { name: "Government health spending, share of GDP", when: "2022-23", display: "1.43%",
+        value: 1.43, min: 0, max: 3, better: "higher", unit: "%", targets: [ { value: 2.5, label: "2.5% by 2025" } ],
+        note: "Up from 1.15% in 2013-14, after a pandemic peak of 1.84% in 2021-22.",
+        sources: [
+          { label: "PIB", url: "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2265816&lang=1&reg=3" },
+          { label: "NHSRC", url: "https://www.nhsrcindia.org/sites/default/files/2024-04/Provisional%20NHA%20Estimates.pdf" }
+        ] },
+      { name: "Out-of-pocket share of all health spending", when: "2022-23", display: "43.4%",
+        value: 43.4, min: 20, max: 70, better: "lower", unit: "%", context: { value: 64.2, label: "64.2% in 2013-14" },
+        note: "Down from 64.2% in 2013-14, but back up from 39.4% in 2021-22, when pandemic spending was high.",
+        sources: [
+          { label: "DD News", url: "https://ddnews.gov.in/en/union-health-ministry-releases-the-national-health-accounts-estimates-for-india-2022-23/" },
+          { label: "NHSRC", url: "https://www.nhsrcindia.org/sites/default/files/2024-04/Provisional%20NHA%20Estimates.pdf" }
+        ] },
+      { name: "Households covered by health insurance or a financing scheme", when: "2023-24", display: "60.2%",
+        value: 60.2, min: 0, max: 100, better: "higher", unit: "%", context: { value: 41.0, label: "41.0% in 2019-21" },
+        note: "Up from 41.0% in NFHS-5, largely reflecting Ayushman Bharat PM-JAY.",
+        sources: [ { label: "Medical Dialogues, citing PIB", url: "https://medicaldialogues.in/amp/news/health/india-sees-progress-in-maternal-and-child-health-immunisation-and-nutrition-nfhs-6-finds-171705" } ] }
+    ] },
+    { title: "Mothers and newborns", items: [
+      { name: "Maternal deaths per 100,000 live births", when: "2022–24", display: "87",
+        value: 87, min: 0, max: 150, better: "lower", unit: "", targets: [ { value: 70, label: "SDG: under 70 by 2030" } ],
+        note: "Down from 130 in 2014–16, but only one point lower than 2021–23, a sign that progress has slowed.",
+        sources: [
+          { label: "SRS bulletin analysis", url: "https://www.researchgate.net/publication/405271140_Analysis_-_MMR_-_2022_-_2024_Comparison_with_2021_-_2023_and_Trend_from_1990_to_2024" },
+          { label: "PIB", url: "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2128024&reg=48&lang=2" }
+        ] },
+      { name: "Newborn deaths per 1,000 live births", when: "2021", display: "19",
+        value: 19, min: 0, max: 30, better: "lower", unit: "", targets: [ { value: 16, label: "16 by 2025" }, { value: 12, label: "SDG: 12 by 2030" } ],
+        note: "Down from 26 in 2014.",
+        sources: [
+          { label: "PIB", url: "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2128024&reg=48&lang=2" },
+          { label: "Targets", url: "https://women.vikaspedia.in/viewcontent/women/women-health/maternal-and-child-mortality-indicators-of-india?lgn=en" }
+        ] },
+      { name: "Under-five deaths per 1,000 live births", when: "2021", display: "31",
+        value: 31, min: 0, max: 50, better: "lower", unit: "", targets: [ { value: 25, label: "SDG: 25 by 2030" }, { value: 23, label: "23 by 2025" } ],
+        note: "Down from 45 in 2014.",
+        sources: [
+          { label: "PIB", url: "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2128024&reg=48&lang=2" },
+          { label: "Targets", url: "https://women.vikaspedia.in/viewcontent/women/women-health/maternal-and-child-mortality-indicators-of-india?lgn=en" }
+        ] },
+      { name: "Mothers with four or more antenatal visits", when: "2023-24", display: "65.2%",
+        value: 65.2, min: 0, max: 100, better: "higher", unit: "%", context: { value: 58.5, label: "58.5% in 2019-21" },
+        note: "Facility births reached 90.6%, up from 88.6%, so most mothers now give birth in a facility but a third still miss the recommended antenatal visits.",
+        sources: [
+          { label: "KP IAS, NFHS-6 summary", url: "https://kpiasacademy.com/nfhs-6-national-family-health-survey/" },
+          { label: "Medical Dialogues", url: "https://medicaldialogues.in/amp/news/health/india-sees-progress-in-maternal-and-child-health-immunisation-and-nutrition-nfhs-6-finds-171705" }
+        ] }
+    ] },
+    { title: "Nutrition", items: [
+      { name: "Children under five who are stunted", when: "2023-24", display: "29.3%",
+        value: 29.3, min: 0, max: 50, better: "lower", unit: "%", targets: [ { value: 25, label: "25% by 2022" } ],
+        note: "Down from 35.5% in 2019-21, but still above the POSHAN Abhiyaan goal set for 2022. NFHS-6 results are provisional.",
+        sources: [
+          { label: "GS Times, NFHS-6", url: "https://www.gstimes.in/national-family-health-survey-6-nfhs-6/" },
+          { label: "Target", url: "https://www.india.gov.in/spotlight/poshan-abhiyaan-pms-overarching-scheme-holistic-nourishment" }
+        ] },
+      { name: "Children under five who are severely wasted", when: "2023-24", display: "5.2%",
+        value: 5.2, min: 0, max: 10, better: "lower", unit: "%", context: { value: 7.7, label: "7.7% in 2019-21" },
+        note: "Down from 7.7% in NFHS-5.",
+        sources: [ { label: "GS Times, NFHS-6", url: "https://www.gstimes.in/national-family-health-survey-6-nfhs-6/" } ] },
+      { name: "Women who are overweight or obese", when: "2023-24", display: "30.7%",
+        value: 30.7, min: 0, max: 40, better: "lower", unit: "%", context: { value: 24.0, label: "24.0% in 2019-21" },
+        note: "Rising fast while undernutrition persists, the double burden NFHS-6 makes plain.",
+        sources: [ { label: "Anantam IAS, NFHS-6", url: "https://anantamias.com/nfhs-6/" } ] },
+      { name: "Women aged 15–49 with anaemia", when: "No new national figure", display: "No data", gap: true,
+        gapText: "NFHS-6 did not report anaemia. The last national figure was 57% of women, from NFHS-5 (2019-21).",
+        note: "POSHAN Abhiyaan aimed to cut anaemia by 3% a year, which can no longer be checked nationally.",
+        sources: [
+          { label: "Anantam IAS", url: "https://anantamias.com/nfhs-6/" },
+          { label: "Frontiers, 2025", url: "https://www.frontiersin.org/journals/health-services/articles/10.3389/frhs.2025.1529094/epub" },
+          { label: "Target", url: "https://www.india.gov.in/spotlight/poshan-abhiyaan-pms-overarching-scheme-holistic-nourishment" }
+        ] }
+    ] }
+  ],
+
+  promises: [
+    { promise: "Public health spending at 2.5% of GDP", source: "National Health Policy 2017", deadline: "2025", latest: "1.43% in 2022-23", status: "Missed",
+      cites: [ { label: "PIB", url: "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2265816&lang=1&reg=3" } ] },
+    { promise: "Child stunting down to 25%", source: "POSHAN Abhiyaan, 2018", deadline: "2022", latest: "29.3% in 2023-24", status: "Missed",
+      cites: [ { label: "India.gov.in", url: "https://www.india.gov.in/spotlight/poshan-abhiyaan-pms-overarching-scheme-holistic-nourishment" }, { label: "GS Times", url: "https://www.gstimes.in/national-family-health-survey-6-nfhs-6/" } ] },
+    { promise: "Maternal mortality at 100 per 100,000 live births", source: "National Health Policy 2017", deadline: "2020", latest: "93 in 2019–21; 87 in 2022–24", status: "Met",
+      cites: [ { label: "PIB", url: "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2128024&reg=48&lang=2" } ] },
+    { promise: "Infant mortality at 28 per 1,000 live births", source: "National Health Policy 2017", deadline: "2019", latest: "28 in 2020; 25 in 2023", status: "Met",
+      cites: [ { label: "PIB", url: "https://www.pib.gov.in/PressReleasePage.aspx?PRID=1861710&reg=48&lang=2" }, { label: "NJCM", url: "https://njcmindia.com/index.php/file/article/download/6648/2382" } ] },
+    { promise: "Under-five mortality at 23 per 1,000 live births", source: "National Health Policy 2017", deadline: "2025", latest: "31 in 2021", status: "Off track",
+      cites: [ { label: "PIB", url: "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2128024&reg=48&lang=2" } ] },
+    { promise: "Newborn mortality at 16 per 1,000 live births", source: "National Health Policy 2017", deadline: "2025", latest: "19 in 2021", status: "Off track",
+      cites: [ { label: "PIB", url: "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2128024&reg=48&lang=2" } ] },
+    { promise: "Anaemia cut by 3% a year", source: "POSHAN Abhiyaan, 2018", deadline: "2022", latest: "Not reported in NFHS-6", status: "No data",
+      cites: [ { label: "Anantam IAS", url: "https://anantamias.com/nfhs-6/" } ] },
+    { promise: "Maternity benefit of at least ₹6,000 for every pregnant woman", source: "National Food Security Act 2013", deadline: "Ongoing", latest: "About 47 lakh women paid a year since April 2023", status: "Off track",
+      cites: [ { label: "Lok Sabha", url: "https://sansad.in/getFile/lsapps/loksabhaquestions/annex/188/AU1004_NwxjYl.pdf" } ] }
+  ]
+};
+
+/* ================================================================
+   Helpers
+   ================================================================ */
+const NS = "http://www.w3.org/2000/svg";
+const fy = y => y + "-" + String((y + 1) % 100).padStart(2, "0");
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text != null) e.textContent = text;
+  return e;
+}
+function html(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+
+/* ================================================================
+   Spending model: line of best fit through the NHA series
+   ================================================================ */
+function gheModel() {
+  const g = DATA.ghe, n = g.values.length;
+  const xs = g.values.map((_, i) => g.start + i);
+  const mx = xs.reduce((a, b) => a + b, 0) / n, my = g.values.reduce((a, b) => a + b, 0) / n;
+  let sxy = 0, sxx = 0;
+  xs.forEach((x, i) => { sxy += (x - mx) * (g.values[i] - my); sxx += (x - mx) * (x - mx); });
+  const slope = sxy / sxx;
+  const fit = x => my + slope * (x - mx);
+  const cross = slope > 0 ? mx + (g.target - my) / slope : null;
+  const peakI = g.values.indexOf(Math.max(...g.values));
+  return { xs, slope, fit, cross, first: g.values[0], last: g.values[n - 1], lastYear: xs[n - 1], peak: g.values[peakI], peakYear: xs[peakI] };
+}
+
+function writeHero(M) {
+  const g = DATA.ghe;
+  const h1 = document.getElementById("hero-title");
+  const crossYear = M.cross ? Math.round(M.cross) : null;
+  if (crossYear === null) {
+    h1.textContent = "India promised to spend 2.5% of GDP on public health by " + g.targetYear + ". On the decade’s trend, it never gets there.";
+  } else if (crossYear > g.targetYear) {
+    h1.textContent = "India promised to spend 2.5% of GDP on public health by " + g.targetYear + ". On the decade’s trend, it gets there around " + crossYear + ".";
+  } else {
+    h1.textContent = "India promised to spend 2.5% of GDP on public health by " + g.targetYear + ", and the decade’s trend gets there in time.";
+  }
+  const late = crossYear ? crossYear - g.targetYear : 0;
+  document.getElementById("lede").innerHTML =
+    "Government health spending was <strong>" + M.last.toFixed(2) + "% of GDP</strong> in " + fy(M.lastYear) + ", up from " + M.first.toFixed(2) + "% in " + fy(g.start) + ". " +
+    "The pandemic lifted it to " + M.peak.toFixed(2) + "% in " + fy(M.peakYear) + ", but it fell back a year later. " +
+    "A line of best fit through ten years of National Health Accounts rises " + M.slope.toFixed(2) + " points a year" +
+    (late > 0 ? ", so 2.5% arrives about " + late + " years after the deadline." : ".");
+  document.getElementById("glide-caveat").textContent =
+    "Line of best fit through the National Health Accounts series, " + fy(g.start) + " to " + fy(M.lastYear) + ", on the old GDP base. It shows the pace of change, not a forecast.";
+}
+
+function renderGlide(M) {
+  const g = DATA.ghe, host = document.getElementById("glide");
+  host.innerHTML = "";
+  const W = Math.max(300, Math.round(host.clientWidth));
+  const narrow = W < 620;
+  const H = narrow ? 300 : 400;
+  const m = { t: 30, r: narrow ? 14 : 24, b: 38, l: 48 };
+  const x0 = g.start - 0.5, x1 = Math.max(2039.5, (M.cross || 2030) + 2.5);
+  const yMin = 1.0, yMax = 2.75;
+  const X = x => m.l + (x - x0) / (x1 - x0) * (W - m.l - m.r);
+  const Y = v => m.t + (yMax - v) / (yMax - yMin) * (H - m.t - m.b);
+  const svg = el("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img",
+    "aria-label": "Line chart of government health spending as a share of GDP, " + fy(g.start) + " to " + fy(M.lastYear) + ", rising from " + M.first + "% to " + M.last + "%, with a pandemic peak of " + M.peak + "%. The 2.5% target was due by " + g.targetYear + "." + (M.cross ? " The ten-year trend reaches 2.5% around " + Math.round(M.cross) + "." : "") });
+
+  [1.0, 1.5, 2.0, 2.5].forEach(v => {
+    svg.appendChild(el("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), class: "grid" }));
+    svg.appendChild(el("text", { x: m.l - 8, y: Y(v) + 4, "text-anchor": "end", class: "ax" }, v.toFixed(1) + "%"));
+  });
+  const step = narrow ? 6 : 3;
+  for (let y = g.start; y <= x1; y += step) {
+    svg.appendChild(el("line", { x1: X(y), x2: X(y), y1: H - m.b, y2: H - m.b + 5, stroke: "var(--track)" }));
+    svg.appendChild(el("text", { x: X(y), y: H - m.b + 22, "text-anchor": "middle", class: "ax" }, fy(y)));
+  }
+
+  // Target line and deadline
+  const yt = Y(g.target);
+  svg.appendChild(el("line", { x1: m.l, x2: W - m.r, y1: yt, y2: yt, stroke: "var(--target)", "stroke-width": 2, "stroke-dasharray": "2 5", "stroke-linecap": "round" }));
+  if (!narrow) svg.appendChild(el("text", { x: m.l + 6, y: yt - 9, class: "lbl-soft" }, "2.5% target, National Health Policy 2017"));
+
+  // Trend
+  if (M.cross) {
+    svg.appendChild(el("line", { x1: X(g.start), y1: Y(M.fit(g.start)), x2: X(M.cross), y2: yt, stroke: "var(--gap)", "stroke-width": 3, "stroke-dasharray": "7 6", "stroke-linecap": "round" }));
+    const end = el("circle", { cx: X(M.cross), cy: yt, r: 5.5, fill: "var(--paper)", stroke: "var(--gap)", "stroke-width": 2.5 });
+    end.appendChild(el("title", {}, "Trend reaches 2.5% around " + Math.round(M.cross)));
+    svg.appendChild(end);
+    if (!narrow) svg.appendChild(el("text", { x: X(M.cross), y: yt - 12, "text-anchor": "end", class: "lbl-gap" }, "2.5% around " + Math.round(M.cross) + " on trend"));
+  }
+
+  // Deadline gap
+  const xd = X(g.targetYear), ytr = Y(M.fit(g.targetYear));
+  svg.appendChild(el("line", { x1: xd, x2: xd, y1: yt + 7, y2: ytr - 7, stroke: "var(--ink-2)", "stroke-width": 1.5, "stroke-dasharray": "1 4", "stroke-linecap": "round" }));
+  const td = el("circle", { cx: xd, cy: ytr, r: 5, fill: "var(--paper)", stroke: "var(--gap)", "stroke-width": 2.5 });
+  td.appendChild(el("title", {}, M.fit(g.targetYear).toFixed(2) + "% in " + fy(g.targetYear) + " on trend"));
+  svg.appendChild(td);
+  const tg = el("circle", { cx: xd, cy: yt, r: 6, fill: "var(--paper)", stroke: "var(--target)", "stroke-width": 3 });
+  tg.appendChild(el("title", {}, "2.5% target by " + g.targetYear));
+  svg.appendChild(tg);
+  svg.appendChild(el("text", { x: xd, y: yt - 14, "text-anchor": "middle", class: "lbl-target" }, "2.5% by " + g.targetYear));
+  if (!narrow) {
+    svg.appendChild(el("text", { x: xd + 10, y: (yt + ytr) / 2 - 26, class: "lbl" }, (g.target - M.fit(g.targetYear)).toFixed(1) + "-point gap at the deadline"));
+    svg.appendChild(el("text", { x: xd + 10, y: ytr + 20, class: "lbl-gap" }, M.fit(g.targetYear).toFixed(2) + "% on trend"));
+  }
+
+  // Actual series
+  const pts = g.values.map((v, i) => X(g.start + i) + "," + Y(v)).join(" ");
+  svg.appendChild(el("polyline", { points: pts, fill: "none", stroke: "var(--ink)", "stroke-width": 3.5, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+  g.values.forEach((v, i) => {
+    const c = el("circle", { cx: X(g.start + i), cy: Y(v), r: 4.5, fill: "var(--ink)", stroke: "var(--paper)", "stroke-width": 2 });
+    c.appendChild(el("title", {}, v.toFixed(2) + "% in " + fy(g.start + i)));
+    svg.appendChild(c);
+  });
+  if (!narrow) {
+    svg.appendChild(el("text", { x: X(g.start) - 4, y: Y(M.first) + 24, class: "lbl" }, M.first.toFixed(2) + "% in " + fy(g.start)));
+    svg.appendChild(el("text", { x: X(M.peakYear), y: Y(M.peak) - 14, "text-anchor": "middle", class: "lbl" }, M.peak.toFixed(2) + "% in the pandemic year"));
+  }
+  svg.appendChild(el("text", { x: X(M.lastYear) + 10, y: Y(M.last) + 22, class: "lbl" }, M.last.toFixed(2) + "% in " + fy(M.lastYear)));
+  host.appendChild(svg);
+}
+
+/* ================================================================
+   Vital signs
+   ================================================================ */
+function fmtVal(v, unit) { return (Number.isInteger(v) ? v : (Math.round(v * 10) / 10)) + unit; }
+
+function renderBar(host, d) {
+  host.innerHTML = "";
+  if (d.gap) { host.appendChild(html("p", "gapnote", d.gapText)); return; }
+  const W = Math.max(240, Math.round(host.clientWidth));
+  const H = 62, pad = 10, y = 26;
+  const pos = v => {
+    const t = Math.max(0, Math.min(1, (v - d.min) / (d.max - d.min)));
+    return pad + (d.better === "higher" ? t : 1 - t) * (W - 2 * pad);
+  };
+  const svg = el("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, "aria-hidden": "true" });
+  const leftV = d.better === "higher" ? d.min : d.max, rightV = d.better === "higher" ? d.max : d.min;
+  svg.appendChild(el("text", { x: pad, y: y - 13, class: "bar-end" }, fmtVal(leftV, d.unit)));
+  svg.appendChild(el("text", { x: W - pad, y: y - 13, "text-anchor": "end", class: "bar-end" }, fmtVal(rightV, d.unit)));
+  svg.appendChild(el("line", { x1: pad, x2: W - pad, y1: y, y2: y, stroke: "var(--track)", "stroke-width": 2, "stroke-linecap": "round" }));
+  const xv = pos(d.value);
+  if (d.targets && d.targets.length) {
+    const t0 = d.targets[0].value, xt = pos(t0);
+    const met = d.better === "higher" ? d.value >= t0 : d.value <= t0;
+    svg.appendChild(el("rect", { x: Math.min(xv, xt), y: y - 6, width: Math.abs(xt - xv), height: 12, rx: 2, fill: met ? "var(--met-tint)" : "var(--gap-tint)" }));
+    d.targets.forEach((t, k) => {
+      const x2 = pos(t.value), approx = t.label.length * 6.6;
+      svg.appendChild(el("line", { x1: x2, x2: x2, y1: y - 11, y2: y + 11, stroke: "var(--target)", "stroke-width": 2.5, "stroke-linecap": "round" }));
+      let anchor = "middle", tx = x2;
+      if (d.targets.length > 1) { anchor = k === 0 ? "end" : "start"; tx = k === 0 ? x2 - 6 : x2 + 6; }
+      if (anchor === "start" && tx + approx > W) { anchor = "end"; tx = x2 - 6; }
+      if (anchor === "end" && tx - approx < 0) { anchor = "start"; tx = x2 + 6; }
+      if (anchor === "middle") {
+        if (x2 - approx / 2 < 0) { anchor = "start"; tx = Math.max(0, x2 - 4); }
+        else if (x2 + approx / 2 > W) { anchor = "end"; tx = Math.min(W, x2 + 4); }
+      }
+      svg.appendChild(el("text", { x: tx, y: y + 28, "text-anchor": anchor, class: "bar-target" }, t.label));
+    });
+  }
+  if (d.context) {
+    const xc = pos(d.context.value), left = xc < W / 2;
+    svg.appendChild(el("line", { x1: xc, x2: xc, y1: y - 9, y2: y + 9, stroke: "var(--ink-2)", "stroke-width": 2, "stroke-linecap": "round" }));
+    svg.appendChild(el("text", { x: left ? Math.max(0, xc - 4) : xc + 4, y: y + 28, "text-anchor": left ? "start" : "end", class: "bar-ctx" }, d.context.label));
+  }
+  svg.appendChild(el("circle", { cx: xv, cy: y, r: 7, fill: "var(--ink)", stroke: "var(--paper)", "stroke-width": 2.5 }));
+  host.appendChild(svg);
+}
+
+const bars = [];
+function buildVitals() {
+  const host = document.getElementById("vitals");
+  DATA.groups.forEach(g => {
+    host.appendChild(html("h3", "group", g.title));
+    const ul = html("ul", "vitals");
+    g.items.forEach(d => {
+      const li = html("li", "vital");
+      const head = html("div");
+      head.appendChild(html("p", "name", d.name));
+      head.appendChild(html("p", "when", d.when));
+      li.appendChild(head);
+      li.appendChild(html("p", d.gap ? "value none" : "value", d.display));
+      const bar = html("div", "bar");
+      li.appendChild(bar);
+      const note = html("p", "note", d.note + " ");
+      const src = html("span", "src", "Source: ");
+      d.sources.forEach((s, k) => {
+        const a = html("a", null, s.label); a.href = s.url; src.appendChild(a);
+        if (k < d.sources.length - 1) src.appendChild(document.createTextNode(", "));
+      });
+      note.appendChild(src);
+      li.appendChild(note);
+      ul.appendChild(li);
+      bars.push({ host: bar, d });
+    });
+    host.appendChild(ul);
+  });
+}
+
+/* ================================================================
+   Promises table
+   ================================================================ */
+const STATUS = { "Met": "met", "Missed": "missed", "Off track": "off", "No data": "nodata" };
+function buildPromises() {
+  const tbody = document.querySelector("#promises tbody");
+  DATA.promises.forEach(p => {
+    const tr = document.createElement("tr");
+    tr.appendChild(html("td", "promise", p.promise));
+    tr.appendChild(html("td", null, p.source));
+    tr.appendChild(html("td", null, p.deadline));
+    const latest = html("td", null, p.latest);
+    const cites = html("span", "cites");
+    p.cites.forEach(c => { const a = html("a", null, c.label); a.href = c.url; cites.appendChild(a); });
+    latest.appendChild(cites);
+    tr.appendChild(latest);
+    const st = html("td", "status"); st.appendChild(html("span", "chip " + (STATUS[p.status] || "nodata"), p.status)); tr.appendChild(st);
+    tbody.appendChild(tr);
+  });
+}
+
+/* ================================================================
+   Boot
+   ================================================================ */
+const MODEL = gheModel();
+document.getElementById("meta").textContent = "Updated " + DATA.updated + ".";
+document.getElementById("coverage").textContent = DATA.coverage;
+writeHero(MODEL);
+buildVitals();
+buildPromises();
+function drawAll() { renderGlide(MODEL); bars.forEach(b => renderBar(b.host, b.d)); }
+drawAll();
+let rt;
+window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+</script>
+</body>
+</html>
